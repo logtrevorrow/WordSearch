@@ -23,6 +23,8 @@ struct Output {
     bool isThere;
 };
 
+enum Direction { l, r, u, d, lup, rup, ldown, rdown};
+
 struct Pointer {
     int row;
     int col;
@@ -46,6 +48,8 @@ int main(int argc, const char * argv[]) {
     */
     
     // read in the information from the command line, initialize variables, and open filestream
+    
+    
     int width = atoi(argv[2]);
     int height = atoi(argv[3]);
     string filename = argv[1];
@@ -68,7 +72,7 @@ int main(int argc, const char * argv[]) {
         
         for (size_t i = 0; i < line.size(); ++i) {
             
-            grid[row][col] = tolower(line[i]);
+            grid.at(row).at(col) = tolower(line[i]);
             col++;
         } // for
         
@@ -84,6 +88,7 @@ int main(int argc, const char * argv[]) {
     cout << "Happy Searching!\n";
     
     while (true) {
+        
         
         cout << "What word would you like to search for?\n";
         
@@ -111,6 +116,7 @@ int main(int argc, const char * argv[]) {
                 cout << "Word was not found in the grid\n";
             } // else
         } // else
+        
     } // while
     
     
@@ -154,59 +160,81 @@ Output evaluateNeighbors(const vector< vector<char> > &grid, const string &word,
     
     int size = 1;
     Output found;
+    Direction dir = r;
     found.rowS = pointer.row;
     found.columnS = pointer.col;
     
     while (true && size < word.size()) {
         
         if (((pointer.col + 1) < width) &&
-            grid.at(pointer.row).at(pointer.col + 1) == word[size]) {
+            grid.at(pointer.row).at(pointer.col + 1) == word[size] &&
+            (dir == r | size == 1)) {
+            dir = r;
             size += 1;
             pointer.col++;
+
         } // if
-        else if (((pointer.col - 1) > 0) &&
-                 grid.at(pointer.row).at(pointer.col - 1) == word[size]) {
+        else if (((pointer.col - 1) >= 0) &&
+                 grid.at(pointer.row).at(pointer.col - 1) == word[size] &&
+                 (dir == l | size == 1)) {
+            dir = l;
             size += 1;
             pointer.col--;
+            
         } // if
+        else if (((pointer.row - 1) >= 0) &&
+                 grid.at(pointer.row - 1).at(pointer.col) == word[size] &&
+                 (dir == u | size == 1)) {
+            dir = u;
+            size += 1;
+            pointer.row--;
+        } // else if
         else if (((pointer.row + 1) < height) &&
-                 grid.at(pointer.row + 1).at(pointer.col) == word[size]) {
+                 grid.at(pointer.row + 1).at(pointer.col) == word[size] &&
+                 (dir == d | size == 1)) {
+            dir = d;
             size += 1;
             pointer.row++;
+            
         } // if
-        else if ((pointer.row - 1) > 0 &&
+        else if ((pointer.row - 1) >= 0 &&
                  ((pointer.col + 1) < width) &&
-                 grid.at(pointer.row - 1).at(pointer.col + 1) == word[size]) {
+                 grid.at(pointer.row - 1).at(pointer.col + 1) == word[size] &&
+                 (dir == rup | size == 1)) {
+            dir = rup;
             size += 1;
             pointer.row--;
+            
         } // if
         else if (((pointer.col + 1) < width) &&
                  ((pointer.row + 1) < height) &&
-                 grid.at(pointer.row + 1).at(pointer.col + 1) == word[size]) {
+                 grid.at(pointer.row + 1).at(pointer.col + 1) == word[size] &&
+                 (dir == rdown | size == 1)) {
+            dir = rdown;
             size += 1;
             pointer.row++;
             pointer.col++;
+            
         } // if
-        else if ((pointer.col - 1 > 0) &&
+        else if ((pointer.col - 1 >= 0) &&
                  ((pointer.row + 1) < height) &&
-                 grid.at(pointer.row + 1).at(pointer.col - 1) == word[size]) {
+                 grid.at(pointer.row + 1).at(pointer.col - 1) == word[size] &&
+                 (dir == ldown | size == 1)) {
+            dir = ldown;
             size += 1;
             pointer.col--;
             pointer.row++;
+            
         } // if
-        else if ((pointer.col - 1) > 0 &&
-                 ((pointer.row - 1) > 0) &&
-                 grid.at(pointer.row - 1).at(pointer.col - 1) == word[size]) {
+        else if ((pointer.col - 1) >= 0 &&
+                 ((pointer.row - 1) >= 0) &&
+                 grid.at(pointer.row - 1).at(pointer.col - 1) == word[size] &&
+                 (dir == lup | size == 1)) {
+            dir = lup;
             size += 1;
             pointer.col--;
             pointer.row--;
-        } // if
-        else if (((pointer.col + 1) < width) &&
-                 ((pointer.row - 1) > 0) &&
-                 grid.at(pointer.row - 1).at(pointer.col + 1) == word[size]) {
-            size += 1;
-            pointer.col++;
-            pointer.row--;
+           
         } // if
         else {
             found.isThere = false;
